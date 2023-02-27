@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"morning-box-hackfest-be/config"
+	"morning-box-hackfest-be/middleware"
 	"net/http"
 	"os"
 
@@ -14,15 +15,17 @@ func init() {
 }
 
 func main() {
-	var port string
-
-	if os.Getenv("APP_ENV") == "production" {
-		port = fmt.Sprintf(":%s", os.Getenv("PORT"))
-	} else {
-		port = ":8080"
-	}
+	port := getPort()
 
 	r := gin.Default()
+
+	firebaseAuth := config.SetupFirebase()
+
+	r.Use(func(c *gin.Context) {
+		c.Set("firebaseAuth", firebaseAuth)
+	})
+
+	r.Use(middleware.AuthMiddleware())
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -32,4 +35,11 @@ func main() {
 	})
 
 	r.Run(port)
+}
+
+func getPort() string {
+	if os.Getenv("APP_ENV") == "production" {
+		return fmt.Sprintf(":%s", os.Getenv("PORT"))
+	}
+	return ":8080"
 }
