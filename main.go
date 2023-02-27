@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"morning-box-hackfest-be/config"
 	"morning-box-hackfest-be/middleware"
+	"morning-box-hackfest-be/routes"
 	"net/http"
 	"os"
 
@@ -33,6 +34,8 @@ func main() {
 			"message": "Hackfest 2023",
 		})
 	})
+
+	routes.AddAuthRoutes(r)
 
 	r.Run(port)
 }
