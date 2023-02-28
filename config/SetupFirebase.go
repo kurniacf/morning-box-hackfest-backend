@@ -11,6 +11,29 @@ import (
 	"google.golang.org/api/option"
 )
 
+var (
+	authClient      *auth.Client
+	firestoreClient *firestore.Client
+)
+
+func init() {
+	auth, firestore, err := SetupFirebase()
+	if err != nil {
+		log.Fatalf("Error initializing Firebase: %v", err)
+	}
+
+	authClient = auth
+	firestoreClient = firestore
+}
+
+func GetAuthClient() *auth.Client {
+	return authClient
+}
+
+func GetFirestoreClient() *firestore.Client {
+	return firestoreClient
+}
+
 func SetupFirebase() (*auth.Client, *firestore.Client, error) {
 	serviceAccountKeyFilePath, err := filepath.Abs("./credentials.json")
 	if err != nil {

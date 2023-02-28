@@ -2,17 +2,17 @@ package middleware
 
 import (
 	"context"
+	"morning-box-hackfest-be/config"
 	"net/http"
 	"strings"
 
-	"firebase.google.com/go/v4/auth"
 	"github.com/gin-gonic/gin"
 )
 
 // AuthMiddleware : to verify all authorized operations
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		firebaseAuth := c.MustGet("firebaseAuth").(*auth.Client)
+		firebaseAuth := config.GetAuthClient()
 
 		authorizationToken := c.GetHeader("Authorization")
 		idToken := strings.TrimSpace(strings.Replace(authorizationToken, "Bearer", "", 1))

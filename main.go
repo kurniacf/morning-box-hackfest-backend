@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -26,17 +25,8 @@ func main() {
 	}
 
 	config.LoadEnv()
-	authClient, firestoreClient, err := config.SetupFirebase()
-	if err != nil {
-		log.Fatalf("Failed to setup Firebase: %v", err)
-	}
 
 	r := gin.Default()
-	r.Use(func(c *gin.Context) {
-		c.Set("firebaseAuth", authClient)
-		c.Set("firestoreClient", firestoreClient)
-		c.Next()
-	})
 
 	// Home route
 	r.GET("/", func(c *gin.Context) {
