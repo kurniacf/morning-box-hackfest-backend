@@ -2,29 +2,39 @@ package config
 
 import (
 	"context"
+	"log"
 	"path/filepath"
 
-	firebase "firebase.google.com/go"
-	"firebase.google.com/go/auth"
+	"cloud.google.com/go/firestore"
+	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/auth"
 	"google.golang.org/api/option"
 )
 
-func SetupFirebase() *auth.Client {
+func SetupFirebase() (*auth.Client, *firestore.Client, error) {
 	serviceAccountKeyFilePath, err := filepath.Abs("./credentials.json")
-
 	if err != nil {
-		panic("Unable to load credentials")
+		log.Fatalf("Unable to load service account credentials: %v", err)
 	}
 	opt := option.WithCredentialsFile(serviceAccountKeyFilePath)
-	//Firebase admin SDK initialization
+
+	// Firebase app initialization
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Error initializing Firebase app: %v", err)
 	}
-	//Firebase Auth
+
+	// Firebase Auth initialization
 	auth, err := app.Auth(context.Background())
 	if err != nil {
-		panic(err)
+		log.Fatalf("Error initializing Firebase Auth client: %v", err)
 	}
-	return auth
+
+	// Firestore initialization
+	client, err := app.Firestore(context.Background())
+	if err != nil {
+		log.Fatalf("Error initializing Firestore client: %v", err)
+	}
+
+	return auth, client, nil
 }

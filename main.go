@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"morning-box-hackfest-be/config"
-	"morning-box-hackfest-be/middleware"
-	"morning-box-hackfest-be/routes"
+	"log"
 	"net/http"
 	"os"
+
+	"morning-box-hackfest-be/config"
+	"morning-box-hackfest-be/routes"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,18 +17,28 @@ func init() {
 }
 
 func main() {
-	port := getPort()
+	var port string
+
+	if os.Getenv("APP_ENV") == "production" {
+		port = fmt.Sprintf(":%s", os.Getenv("PORT"))
+	} else {
+		port = ":8080"
+	}
+
+	config.LoadEnv()
+	authClient, firestoreClient, err := config.SetupFirebase()
+	if err != nil {
+		log.Fatalf("Failed to setup Firebase: %v", err)
+	}
 
 	r := gin.Default()
-
-	firebaseAuth := config.SetupFirebase()
-
 	r.Use(func(c *gin.Context) {
-		c.Set("firebaseAuth", firebaseAuth)
+		c.Set("firebaseAuth", authClient)
+		c.Set("firestoreClient", firestoreClient)
+		c.Next()
 	})
 
-	r.Use(middleware.AuthMiddleware())
-
+	// Home route
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
@@ -35,14 +46,11 @@ func main() {
 		})
 	})
 
+	// Auth routes
 	routes.AddAuthRoutes(r)
 
-	r.Run(port)
-}
+	// Food routes
+	routes.AddFoodRoutes(r)
 
-func getPort() string {
-	if os.Getenv("APP_ENV") == "production" {
-		return fmt.Sprintf(":%s", os.Getenv("PORT"))
-	}
-	return ":8080"
+	r.Run(port)
 }
