@@ -16,15 +16,7 @@ func init() {
 }
 
 func main() {
-	var port string
-
-	if os.Getenv("APP_ENV") == "production" {
-		port = fmt.Sprintf(":%s", os.Getenv("PORT"))
-	} else {
-		port = ":8080"
-	}
-
-	config.LoadEnv()
+	port := getPort()
 
 	r := gin.Default()
 
@@ -43,4 +35,11 @@ func main() {
 	routes.AddFoodRoutes(r)
 
 	r.Run(port)
+}
+
+func getPort() string {
+	if os.Getenv("APP_ENV") == "production" {
+		return fmt.Sprintf(":%s", os.Getenv("PORT"))
+	}
+	return ":8080"
 }
