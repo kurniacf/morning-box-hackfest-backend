@@ -90,6 +90,14 @@ func (r *foodRepository) UpdateFood(id string, food model.Food) error {
 			Path:  "imageUrl",
 			Value: food.ImageURL,
 		},
+		{
+			Path:  "calories",
+			Value: food.Calories,
+		},
+		{
+			Path:  "type",
+			Value: food.Type,
+		},
 	})
 	// _, err := r.client.Collection("foods").Doc(id).Set(context.Background(), food)
 	if err != nil {

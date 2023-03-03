@@ -14,13 +14,13 @@ func AddFoodRoutes(r *gin.Engine) {
 
 	firestoreClient := config.GetFirestoreClient()
 
-	repository := repository.NewFoodRepository(firestoreClient)
-	service := service.NewFoodService(repository)
-	handler := handler.NewFoodHandler(service)
+	foodRepo := repository.NewFoodRepository(firestoreClient)
+	foodService := service.NewFoodService(foodRepo)
+	foodHandler := handler.NewFoodHandler(foodService)
 
-	foodGroup.GET("", handler.GetAllFoods)
-	foodGroup.GET("/:id", handler.GetFood)
-	foodGroup.POST("", handler.CreateFood)
-	foodGroup.PUT("/:id", handler.UpdateFood)
-	foodGroup.DELETE("/:id", handler.DeleteFood)
+	foodGroup.GET("", foodHandler.GetAllFoods)
+	foodGroup.GET("/:id", foodHandler.GetFood)
+	foodGroup.POST("", foodHandler.CreateFood)
+	foodGroup.PUT("/:id", foodHandler.UpdateFood)
+	foodGroup.DELETE("/:id", foodHandler.DeleteFood)
 }

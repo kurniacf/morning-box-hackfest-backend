@@ -123,10 +123,12 @@ func (h *foodHandler) DeleteFood(c *gin.Context) {
 	})
 }
 
-func convertToFoodModel(food model.FoodRequest) model.Food {
+func convertToFoodModel(foodRequest model.FoodRequest) model.Food {
 	return model.Food{
-		Name:        food.Name,
-		Description: food.Description,
-		ImageURL:    food.ImageURL,
+		Name:        foodRequest.Name,
+		Description: foodRequest.Description,
+		ImageURL:    foodRequest.ImageURL,
+		Calories:    foodRequest.Calories,
+		Type:        foodRequest.Type,
 	}
 }
