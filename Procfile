@@ -1,1 +1,1 @@
-web: ./morning-box-hackfest-be -port=8080
+web: ./main.go -port=8080
