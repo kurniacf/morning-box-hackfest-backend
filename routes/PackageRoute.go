@@ -1,24 +1,26 @@
 package routes
 
 import (
+	"morning-box-hackfest-be/config"
 	"morning-box-hackfest-be/handler"
 	"morning-box-hackfest-be/repository"
 	"morning-box-hackfest-be/service"
 
-	"cloud.google.com/go/firestore"
 	"github.com/gin-gonic/gin"
 )
 
-func SetupPackageRoutes(router *gin.Engine, client *firestore.Client) {
-	packageRepo := repository.NewPackageRepository(client)
+func AddPackageRoutes(r *gin.Engine) {
+	firestoreClient := config.GetFirestoreClient()
+	packageRepo := repository.NewPackageRepository(firestoreClient)
 	packageService := service.NewPackageService(packageRepo)
 	packageHandler := handler.NewPackageHandler(*packageService)
-	packages := router.Group("/packages")
+
+	packageGroup := r.Group("/packages")
 	{
-		packages.GET("", packageHandler.GetAllPackages)
-		packages.GET("/:id", packageHandler.GetPackage)
-		packages.POST("", packageHandler.CreatePackage)
-		packages.PUT("/:id", packageHandler.UpdatePackage)
-		packages.DELETE("/:id", packageHandler.DeletePackage)
+		packageGroup.GET("", packageHandler.GetAllPackages)
+		packageGroup.GET("/:id", packageHandler.GetPackage)
+		packageGroup.POST("", packageHandler.CreatePackage)
+		packageGroup.PUT("/:id", packageHandler.UpdatePackage)
+		packageGroup.DELETE("/:id", packageHandler.DeletePackage)
 	}
 }
