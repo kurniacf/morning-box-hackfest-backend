@@ -8,8 +8,8 @@ import (
 type FoodServiceInterface interface {
 	GetAllFoods() ([]model.FoodResponse, error)
 	GetFood(id string) (model.FoodResponse, error)
-	CreateFood(food model.Food) (string, error)
-	UpdateFood(id string, food model.Food) error
+	CreateFood(food model.FoodRequest) (string, error)
+	UpdateFood(id string, food model.FoodRequest) error
 	DeleteFood(id string) error
 }
 
@@ -32,24 +32,68 @@ func (s *foodService) GetAllFoods() ([]model.FoodResponse, error) {
 
 func (s *foodService) GetFood(id string) (model.FoodResponse, error) {
 	food, err := s.repo.GetFood(id)
+	if err != nil {
+		return model.FoodResponse{}, err
+	}
 
-	return food, err
+	return food, nil
 }
 
-func (s *foodService) CreateFood(food model.Food) (string, error) {
-	foodId, err := s.repo.CreateFood(food)
+func (s *foodService) CreateFood(food model.FoodRequest) (string, error) {
+	newFood := model.Food{
+		Name:        food.Name,
+		Description: food.Description,
+		ImageURL:    food.ImageURL,
+		Calories:    food.Calories,
+		Type:        food.Type,
+	}
 
-	return foodId, err
+	newFoodRequest := model.FoodRequest{
+		Name:        newFood.Name,
+		Description: newFood.Description,
+		ImageURL:    newFood.ImageURL,
+		Calories:    newFood.Calories,
+		Type:        newFood.Type,
+	}
+
+	foodId, err := s.repo.CreateFood(newFoodRequest)
+	if err != nil {
+		return "", err
+	}
+
+	return foodId, nil
 }
 
-func (s *foodService) UpdateFood(id string, food model.Food) error {
-	err := s.repo.UpdateFood(id, food)
+func (s *foodService) UpdateFood(id string, food model.FoodRequest) error {
+	updateFood := model.Food{
+		Name:        food.Name,
+		Description: food.Description,
+		ImageURL:    food.ImageURL,
+		Calories:    food.Calories,
+		Type:        food.Type,
+	}
 
-	return err
+	updateFoodRequest := model.FoodRequest{
+		Name:        updateFood.Name,
+		Description: updateFood.Description,
+		ImageURL:    updateFood.ImageURL,
+		Calories:    updateFood.Calories,
+		Type:        updateFood.Type,
+	}
+
+	err := s.repo.UpdateFood(id, updateFoodRequest)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *foodService) DeleteFood(id string) error {
 	err := s.repo.DeleteFood(id)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }

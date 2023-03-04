@@ -11,8 +11,8 @@ import (
 type FoodRepositoryInterface interface {
 	GetAllFoods() ([]model.FoodResponse, error)
 	GetFood(id string) (model.FoodResponse, error)
-	CreateFood(food model.Food) (string, error)
-	UpdateFood(id string, food model.Food) error
+	CreateFood(food model.FoodRequest) (string, error)
+	UpdateFood(id string, food model.FoodRequest) error
 	DeleteFood(id string) error
 }
 
@@ -47,6 +47,7 @@ func (r *foodRepository) GetAllFoods() ([]model.FoodResponse, error) {
 			return nil, err
 		}
 
+		food.Id = doc.Ref.ID
 		foods = append(foods, food)
 	}
 
@@ -64,10 +65,11 @@ func (r *foodRepository) GetFood(id string) (model.FoodResponse, error) {
 		return model.FoodResponse{}, err
 	}
 
+	food.Id = doc.Ref.ID
 	return food, nil
 }
 
-func (r *foodRepository) CreateFood(food model.Food) (string, error) {
+func (r *foodRepository) CreateFood(food model.FoodRequest) (string, error) {
 	doc, _, err := r.client.Collection("foods").Add(context.Background(), food)
 	if err != nil {
 		return "", err
@@ -76,30 +78,8 @@ func (r *foodRepository) CreateFood(food model.Food) (string, error) {
 	return doc.ID, nil
 }
 
-func (r *foodRepository) UpdateFood(id string, food model.Food) error {
-	_, err := r.client.Collection("foods").Doc(id).Update(context.Background(), []firestore.Update{
-		{
-			Path:  "name",
-			Value: food.Name,
-		},
-		{
-			Path:  "description",
-			Value: food.Description,
-		},
-		{
-			Path:  "imageUrl",
-			Value: food.ImageURL,
-		},
-		{
-			Path:  "calories",
-			Value: food.Calories,
-		},
-		{
-			Path:  "type",
-			Value: food.Type,
-		},
-	})
-	// _, err := r.client.Collection("foods").Doc(id).Set(context.Background(), food)
+func (r *foodRepository) UpdateFood(id string, food model.FoodRequest) error {
+	_, err := r.client.Collection("foods").Doc(id).Set(context.Background(), food)
 	if err != nil {
 		return err
 	}
