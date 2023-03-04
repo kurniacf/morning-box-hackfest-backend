@@ -37,8 +37,11 @@ func main() {
 	// Package routes
 	routes.AddPackageRoutes(r)
 
-	// App routes
+	// User routes
 	routes.AddUserRoutes(r)
+
+	// Point routes
+	routes.AddPointRoutes(r)
 
 	r.Run(port)
 }
