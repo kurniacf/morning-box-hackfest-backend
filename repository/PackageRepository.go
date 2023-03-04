@@ -52,16 +52,16 @@ func (r *PackageRepository) GetAllPackages() ([]*model.PackageResponse, error) {
 
 }
 
-func (r *PackageRepository) GetPackage(id string) (*model.PackageResponse, error) {
+func (r *PackageRepository) GetPackage(id string) (model.PackageResponse, error) {
 	doc, err := r.client.Collection(r.collection).Doc(id).Get(context.Background())
 	if err != nil {
-		return nil, err
+		return model.PackageResponse{}, err
 	}
 
 	var p model.Package
 	doc.DataTo(&p)
 
-	return &model.PackageResponse{
+	return model.PackageResponse{
 		Id:    doc.Ref.ID,
 		Name:  p.Name,
 		Price: p.Price,
