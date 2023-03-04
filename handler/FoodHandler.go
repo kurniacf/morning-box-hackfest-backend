@@ -18,7 +18,6 @@ func NewFoodHandler(service service.FoodServiceInterface) *foodHandler {
 
 func (h *foodHandler) GetAllFoods(c *gin.Context) {
 	foods, err := h.service.GetAllFoods()
-
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -50,19 +49,15 @@ func (h *foodHandler) GetFood(c *gin.Context) {
 func (h *foodHandler) CreateFood(c *gin.Context) {
 	var (
 		foodRequest model.FoodRequest
-		food        model.Food
 		err         error
 	)
-
 	err = c.ShouldBindJSON(&foodRequest)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	food = convertToFoodModel(foodRequest)
-
-	createdFoodID, err := h.service.CreateFood(food)
+	createdFoodID, err := h.service.CreateFood(foodRequest)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -79,11 +74,9 @@ func (h *foodHandler) CreateFood(c *gin.Context) {
 func (h *foodHandler) UpdateFood(c *gin.Context) {
 	var (
 		foodRequest model.FoodRequest
-		food        model.Food
 		id          string
 		err         error
 	)
-
 	id = c.Param("id")
 
 	err = c.ShouldBindJSON(&foodRequest)
@@ -92,9 +85,7 @@ func (h *foodHandler) UpdateFood(c *gin.Context) {
 		return
 	}
 
-	food = convertToFoodModel(foodRequest)
-
-	err = h.service.UpdateFood(id, food)
+	err = h.service.UpdateFood(id, foodRequest)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -109,7 +100,6 @@ func (h *foodHandler) UpdateFood(c *gin.Context) {
 
 func (h *foodHandler) DeleteFood(c *gin.Context) {
 	id := c.Param("id")
-
 	err := h.service.DeleteFood(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -121,14 +111,4 @@ func (h *foodHandler) DeleteFood(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Data deleted successfully",
 	})
-}
-
-func convertToFoodModel(foodRequest model.FoodRequest) model.Food {
-	return model.Food{
-		Name:        foodRequest.Name,
-		Description: foodRequest.Description,
-		ImageURL:    foodRequest.ImageURL,
-		Calories:    foodRequest.Calories,
-		Type:        foodRequest.Type,
-	}
 }

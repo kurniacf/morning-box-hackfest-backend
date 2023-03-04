@@ -10,17 +10,17 @@ import (
 )
 
 func AddFoodRoutes(r *gin.Engine) {
-	foodGroup := r.Group("/foods")
-
 	firestoreClient := config.GetFirestoreClient()
-
 	foodRepo := repository.NewFoodRepository(firestoreClient)
 	foodService := service.NewFoodService(foodRepo)
 	foodHandler := handler.NewFoodHandler(foodService)
 
-	foodGroup.GET("", foodHandler.GetAllFoods)
-	foodGroup.GET("/:id", foodHandler.GetFood)
-	foodGroup.POST("", foodHandler.CreateFood)
-	foodGroup.PUT("/:id", foodHandler.UpdateFood)
-	foodGroup.DELETE("/:id", foodHandler.DeleteFood)
+	foodGroup := r.Group("/foods")
+	{
+		foodGroup.GET("", foodHandler.GetAllFoods)
+		foodGroup.GET("/:id", foodHandler.GetFood)
+		foodGroup.POST("", foodHandler.CreateFood)
+		foodGroup.PUT("/:id", foodHandler.UpdateFood)
+		foodGroup.DELETE("/:id", foodHandler.DeleteFood)
+	}
 }

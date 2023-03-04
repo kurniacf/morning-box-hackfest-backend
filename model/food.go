@@ -9,6 +9,7 @@ type Food struct {
 }
 
 type FoodResponse struct {
+	Id          string `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	ImageURL    string `json:"imageUrl"`
