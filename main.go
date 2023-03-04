@@ -34,6 +34,9 @@ func main() {
 	// Food routes
 	routes.AddFoodRoutes(r)
 
+	// Package routes
+	routes.AddPackageRoutes(r)
+
 	r.Run(port)
 }
 
