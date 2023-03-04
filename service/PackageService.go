@@ -21,10 +21,10 @@ func (s *PackageService) GetAllPackages() ([]*model.PackageResponse, error) {
 	return packages, nil
 }
 
-func (s *PackageService) GetPackage(id string) (*model.PackageResponse, error) {
+func (s *PackageService) GetPackage(id string) (model.PackageResponse, error) {
 	p, err := s.repo.GetPackage(id)
 	if err != nil {
-		return nil, err
+		return model.PackageResponse{}, err
 	}
 	return p, nil
 }

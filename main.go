@@ -43,6 +43,9 @@ func main() {
 	// Point routes
 	routes.AddPointRoutes(r)
 
+	// Order routes
+	routes.AddOrderRoutes(r)
+
 	r.Run(port)
 }
 
