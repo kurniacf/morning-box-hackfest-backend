@@ -3,6 +3,9 @@
 
 ### Table of Contents
 - [My Team](#my-team)
+- [Description](#description)
+- [Solution](#solution)
+- [Tech Stack](#tech-stack)
 
 ### My Team
 - [Nur Muhammad Ainul Yaqin](https://www.linkedin.com/in/nurmuhammad22/)
