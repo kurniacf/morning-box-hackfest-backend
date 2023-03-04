@@ -1,1 +1,1 @@
-web: ./morning-box -port=8080
+web: ./morning-box-hackfest-be -port=8080
