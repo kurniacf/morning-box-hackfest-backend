@@ -44,7 +44,7 @@ func main() {
 	// // Order routes
 	routes.AddOrderRoutes(r)
 
-	// // Payment routes
+	// Payment routes
 	routes.AddPaymentRoutes(r)
 
 	r.Run(port)
