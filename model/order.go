@@ -12,6 +12,7 @@ type Order struct {
 }
 
 type OrderResponse struct {
+	Id              string          `json:"id"`
 	User            UserResponse    `json:"user"`
 	Package         PackageResponse `json:"package"`
 	OrderDate       time.Time       `json:"orderDate"`

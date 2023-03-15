@@ -13,6 +13,7 @@ import (
 
 func init() {
 	config.LoadEnv()
+	config.InitMidtrans()
 }
 
 func main() {
@@ -45,6 +46,9 @@ func main() {
 
 	// Order routes
 	routes.AddOrderRoutes(r)
+
+	// Payment routes
+	routes.AddPaymentRoutes(r)
 
 	r.Run(port)
 }

@@ -46,7 +46,8 @@ func (s *userService) CreateUser(user model.UserRequest) (string, error) {
 		Password:    user.Password,
 		PhoneNumber: user.PhoneNumber,
 		Address:     user.Address,
-		Point:       user.Point,
+		City:        user.City,
+		PostalCode:  user.PostalCode,
 	}
 
 	newUserRequest := model.UserRequest{
@@ -55,7 +56,8 @@ func (s *userService) CreateUser(user model.UserRequest) (string, error) {
 		Password:    newUser.Password,
 		PhoneNumber: newUser.PhoneNumber,
 		Address:     newUser.Address,
-		Point:       newUser.Point,
+		City:        user.City,
+		PostalCode:  user.PostalCode,
 	}
 
 	userId, err := s.repo.CreateUser(newUserRequest)
@@ -73,7 +75,8 @@ func (s *userService) UpdateUser(id string, user model.UserRequest) error {
 		Password:    user.Password,
 		PhoneNumber: user.PhoneNumber,
 		Address:     user.Address,
-		Point:       user.Point,
+		City:        user.City,
+		PostalCode:  user.PostalCode,
 	}
 
 	updateUserRequest := model.UserRequest{
@@ -82,7 +85,8 @@ func (s *userService) UpdateUser(id string, user model.UserRequest) error {
 		Password:    updateUser.Password,
 		PhoneNumber: updateUser.PhoneNumber,
 		Address:     updateUser.Address,
-		Point:       updateUser.Point,
+		City:        user.City,
+		PostalCode:  user.PostalCode,
 	}
 
 	err := s.repo.UpdateUser(id, updateUserRequest)

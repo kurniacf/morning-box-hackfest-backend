@@ -6,7 +6,8 @@ type User struct {
 	Password    string `json:"password" firestore:"password"`
 	PhoneNumber string `json:"phone_number" firestore:"phone_number"`
 	Address     string `json:"address" firestore:"address"`
-	Point       int    `json:"point" firestore:"point"`
+	City        string `json:"city" firestore:"city"`
+	PostalCode  string `json:"postal_code" firestore:"postal_code"`
 }
 
 type UserResponse struct {
@@ -15,7 +16,8 @@ type UserResponse struct {
 	Email       string `json:"email"`
 	PhoneNumber string `json:"phone_number"`
 	Address     string `json:"address"`
-	Point       int    `json:"point"`
+	City        string `json:"city"`
+	PostalCode  string `json:"postal_code"`
 }
 
 type UserRequest struct {
@@ -24,5 +26,6 @@ type UserRequest struct {
 	Password    string `json:"password" binding:"required"`
 	PhoneNumber string `json:"phone_number" binding:"required"`
 	Address     string `json:"address" binding:"required"`
-	Point       int    `json:"point"`
+	City        string `json:"city" binding:"required"`
+	PostalCode  string `json:"postal_code" binding:"required"`
 }
