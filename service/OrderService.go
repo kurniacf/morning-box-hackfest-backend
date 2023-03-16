@@ -13,6 +13,7 @@ type OrderServiceInterface interface {
 	UpdateOrder(id string, order model.OrderUpdateRequest) error
 	DeleteOrder(id string) error
 	ConfirmOrderADayBefore(id string) error
+	GetActiveOrder(userId string) (*model.OrderResponse, error)
 }
 
 type orderService struct {
@@ -97,4 +98,13 @@ func (s *orderService) ConfirmOrderADayBefore(id string) error {
 	}
 
 	return nil
+}
+
+func (s *orderService) GetActiveOrder(userId string) (*model.OrderResponse, error) {
+	order, err := s.repo.GetActiveOrder(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return order, nil
 }

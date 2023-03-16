@@ -3,6 +3,7 @@ package routes
 import (
 	"morning-box-hackfest-be/config"
 	"morning-box-hackfest-be/handler"
+	"morning-box-hackfest-be/middleware"
 	"morning-box-hackfest-be/repository"
 	"morning-box-hackfest-be/service"
 
@@ -23,6 +24,7 @@ func AddOrderRoutes(r *gin.Engine) {
 		orderGroup.PUT("/:id", orderHandler.UpdateOrder)
 		orderGroup.DELETE("/:id", orderHandler.DeleteOrder)
 		orderGroup.POST("/confirm/:id", orderHandler.ConfirmOrderADayBefore)
+		orderGroup.GET("/active", middleware.AuthMiddleware(), orderHandler.GetActiveOrder)
 	}
 
 }

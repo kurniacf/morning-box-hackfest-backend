@@ -17,6 +17,7 @@ type OrderRepositoryInterface interface {
 	UpdateOrder(id string, order model.Order) error
 	DeleteOrder(id string) error
 	ConfirmOrderADayBefore(id string) error
+	GetActiveOrder(userId string) (*model.OrderResponse, error)
 }
 
 type orderRepository struct {
@@ -139,4 +140,39 @@ func (r *orderRepository) ConfirmOrderADayBefore(id string) error {
 	}
 
 	return nil
+}
+
+func (r *orderRepository) GetActiveOrder(userId string) (*model.OrderResponse, error) {
+	iter := r.client.Collection(r.collection).Where("userId", "==", userId).Where("endDate", ">=", time.Now()).Documents(context.Background())
+
+	defer iter.Stop()
+
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		var order *model.Order
+		if err = doc.DataTo(&order); err != nil {
+			return nil, err
+		}
+
+		return &model.OrderResponse{
+			User: model.UserResponse{
+				Id: order.UserId,
+			},
+			Package: model.PackageResponse{
+				Id: order.PackageId,
+			},
+			EndDate:         order.EndDate,
+			DeliveryAddress: order.DeliveryAddress,
+			Status:          order.Status,
+		}, nil
+	}
+
+	return nil, nil
 }

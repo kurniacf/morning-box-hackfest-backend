@@ -141,3 +141,18 @@ func (h *orderHandler) ConfirmOrderADayBefore(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Order confirmed successfully"})
 }
+
+func (h *orderHandler) GetActiveOrder(c *gin.Context) {
+	user, _ := c.Get("user")
+
+	userId := user.(model.UserResponse).Id
+
+	order, err := h.service.GetActiveOrder(userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		// c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get active order"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": order})
+}
