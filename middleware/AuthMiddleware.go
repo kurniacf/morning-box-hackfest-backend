@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"context"
 	"morning-box-hackfest-be/config"
+	"morning-box-hackfest-be/repository"
+	"morning-box-hackfest-be/service"
 	"net/http"
 	"strings"
 
@@ -12,8 +13,6 @@ import (
 // AuthMiddleware : to verify all authorized operations
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		firebaseAuth := config.GetAuthClient()
-
 		authorizationToken := c.GetHeader("Authorization")
 		idToken := strings.TrimSpace(strings.Replace(authorizationToken, "Bearer", "", 1))
 		if idToken == "" {
@@ -21,15 +20,20 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		//verify token
-		token, err := firebaseAuth.VerifyIDToken(context.Background(), idToken)
+
+		// get user
+		firestoreClient := config.GetFirestoreClient()
+		userRepo := repository.NewUserRepository(firestoreClient)
+		userService := service.NewUserService(userRepo)
+
+		user, err := userService.GetUser(idToken)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid token"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			c.Abort()
 			return
 		}
 
-		c.Set("token", token.UID)
+		c.Set("user", user)
 		c.Next()
 	}
 }
