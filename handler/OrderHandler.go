@@ -149,8 +149,7 @@ func (h *orderHandler) GetActiveOrder(c *gin.Context) {
 
 	order, err := h.service.GetActiveOrder(userId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		// c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get active order"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get active order"})
 		return
 	}
 
