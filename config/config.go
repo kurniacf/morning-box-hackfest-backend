@@ -1,6 +1,8 @@
 package config
 
 import (
+	"os"
+
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/snap"
 )
@@ -8,8 +10,8 @@ import (
 var MidtransClient snap.Client
 
 func InitMidtrans() {
-	midtrans.ServerKey = "SB-Mid-server-VoVtdr2Wycry4xHajdm5EX1d"
-	midtrans.ClientKey = "SB-Mid-client-B2g-59qPVMbJnlG9"
+	midtrans.ServerKey = os.Getenv("MIDTRANS_SERVER_KEY")
+	midtrans.ClientKey = os.Getenv("MIDTRANS_CLIENT_KEY")
 	midtrans.Environment = midtrans.Sandbox // Ganti dengan midtrans.Production untuk environment produksi
 
 	MidtransClient = snap.Client{}
