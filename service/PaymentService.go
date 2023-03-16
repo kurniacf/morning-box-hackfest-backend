@@ -14,6 +14,7 @@ type PaymentServiceInterface interface {
 	CreateTransaction(order model.OrderResponse) (string, error)
 	CreateTokenTransactionWithGateway(order model.OrderResponse) (string, error)
 	CreateUrlTransactionWithGateway(order model.OrderResponse) (string, error)
+	//ProcessWebhookNotification(notification *midtrans.TransactionNotification) error
 }
 
 type paymentService struct{}

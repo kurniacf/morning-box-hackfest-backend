@@ -14,5 +14,6 @@ func AddPaymentRoutes(r *gin.Engine) {
 	payment := r.Group("/payment")
 	{
 		payment.POST("/create", paymentHandler.CreateTransaction)
+		//payment.POST("/webhook", paymentHandler.HandleMidtransWebhook)
 	}
 }
