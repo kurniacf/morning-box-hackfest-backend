@@ -54,7 +54,7 @@ func main() {
 }
 
 func getPort() string {
-	if os.Getenv("APP_ENV") == "production" {
+	if os.Getenv("PORT") != "" {
 		return fmt.Sprintf(":%s", os.Getenv("PORT"))
 	}
 	return ":8080"
