@@ -143,7 +143,7 @@ func (r *orderRepository) ConfirmOrderADayBefore(id string) error {
 }
 
 func (r *orderRepository) GetActiveOrder(userId string) (*model.OrderResponse, error) {
-	iter := r.client.Collection(r.collection).Where("UserId", "==", userId).Where("EndDate", ">=", time.Now()).Documents(context.Background())
+	iter := r.client.Collection(r.collection).Where("userId", "==", userId).Where("endDate", ">=", time.Now()).Documents(context.Background())
 
 	defer iter.Stop()
 

@@ -153,5 +153,27 @@ func (h *orderHandler) GetActiveOrder(c *gin.Context) {
 		return
 	}
 
+	firestoreClient := config.GetFirestoreClient()
+
+	packageRepo := repository.NewPackageRepository(firestoreClient)
+	packageService := service.NewPackageService(packageRepo)
+
+	userRepo := repository.NewUserRepository(firestoreClient)
+	userService := service.NewUserService(userRepo)
+
+	foodRepo := repository.NewFoodRepository(firestoreClient)
+	foodService := service.NewFoodService(foodRepo)
+
+	order.Package, _ = packageService.GetPackage(order.Package.Id)
+	order.User, _ = userService.GetUser(order.User.Id)
+
+	order.Package.Foods.Monday, _ = foodService.GetFood(order.Package.Foods.Monday.Id)
+	order.Package.Foods.Tuesday, _ = foodService.GetFood(order.Package.Foods.Tuesday.Id)
+	order.Package.Foods.Wednesday, _ = foodService.GetFood(order.Package.Foods.Wednesday.Id)
+	order.Package.Foods.Thursday, _ = foodService.GetFood(order.Package.Foods.Thursday.Id)
+	order.Package.Foods.Friday, _ = foodService.GetFood(order.Package.Foods.Friday.Id)
+	order.Package.Foods.Saturday, _ = foodService.GetFood(order.Package.Foods.Saturday.Id)
+	order.Package.Foods.Sunday, _ = foodService.GetFood(order.Package.Foods.Tuesday.Id)
+
 	c.JSON(http.StatusOK, gin.H{"data": order})
 }
