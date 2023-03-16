@@ -45,7 +45,7 @@ func (s *orderService) CreateOrder(order model.OrderRequest) (string, error) {
 	orderRequest := model.Order{
 		UserId:          order.UserId,
 		PackageId:       order.PackageId,
-		EndDate:         time.Now().AddDate(0, 0, order.WeekOrder),
+		EndDate:         time.Now().AddDate(0, 0, order.WeekOrder*7),
 		DeliveryAddress: order.DeliveryAddress,
 		Status:          model.BELUM_DIKONFIRMASI,
 	}
