@@ -40,7 +40,6 @@ func (s *authService) Signin(authSignIn model.AuthSignin) (*model.UserResponse, 
 		Email:       user.Email,
 		PhoneNumber: user.PhoneNumber,
 		Address:     user.Address,
-		Point:       user.Point,
 	}
 
 	return userResponse, nil
