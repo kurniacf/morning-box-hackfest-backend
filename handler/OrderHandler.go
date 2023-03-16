@@ -6,6 +6,7 @@ import (
 	"morning-box-hackfest-be/repository"
 	"morning-box-hackfest-be/service"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -97,7 +98,7 @@ func (h *orderHandler) CreateOrder(c *gin.Context) {
 func (h *orderHandler) UpdateOrder(c *gin.Context) {
 	id := c.Param("id")
 
-	var req model.OrderRequest
+	var req model.OrderUpdateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -120,4 +121,23 @@ func (h *orderHandler) DeleteOrder(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Package deleted successfully"})
+}
+
+func (h *orderHandler) ConfirmOrderADayBefore(c *gin.Context) {
+	hour := time.Now().Hour()
+
+	if !(hour > 18 && hour < 24) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Confirmation can only be done between 18:00 to 24:00"})
+		return
+	}
+
+	id := c.Param("id")
+
+	err := h.service.ConfirmOrderADayBefore(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Confirmation failed"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Order confirmed successfully"})
 }

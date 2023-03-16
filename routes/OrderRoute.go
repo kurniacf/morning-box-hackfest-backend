@@ -22,6 +22,7 @@ func AddOrderRoutes(r *gin.Engine) {
 		orderGroup.POST("/", orderHandler.CreateOrder)
 		orderGroup.PUT("/:id", orderHandler.UpdateOrder)
 		orderGroup.DELETE("/:id", orderHandler.DeleteOrder)
+		orderGroup.POST("/confirm/:id", orderHandler.ConfirmOrderADayBefore)
 	}
 
 }

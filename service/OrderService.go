@@ -10,8 +10,9 @@ type OrderServiceInterface interface {
 	GetAllOrders() ([]*model.OrderResponse, error)
 	GetOrder(id string) (model.OrderResponse, error)
 	CreateOrder(order model.OrderRequest) (string, error)
-	UpdateOrder(id string, order model.OrderRequest) error
+	UpdateOrder(id string, order model.OrderUpdateRequest) error
 	DeleteOrder(id string) error
+	ConfirmOrderADayBefore(id string) error
 }
 
 type orderService struct {
@@ -44,10 +45,9 @@ func (s *orderService) CreateOrder(order model.OrderRequest) (string, error) {
 	orderRequest := model.Order{
 		UserId:          order.UserId,
 		PackageId:       order.PackageId,
-		OrderDate:       time.Now(),
-		Days:            order.Days,
+		EndDate:         time.Now().AddDate(0, 0, order.WeekOrder),
 		DeliveryAddress: order.DeliveryAddress,
-		Status:          "",
+		Status:          model.BELUM_DIKONFIRMASI,
 	}
 
 	orderId, err := s.repo.CreateOrder(orderRequest)
@@ -58,22 +58,22 @@ func (s *orderService) CreateOrder(order model.OrderRequest) (string, error) {
 	return orderId, nil
 }
 
-func (s *orderService) UpdateOrder(id string, order model.OrderRequest) error {
+func (s *orderService) UpdateOrder(id string, order model.OrderUpdateRequest) error {
 	_, err := s.repo.GetOrder(id)
 	if err != nil {
 		return err
 	}
 
-	orderRequest := model.OrderRequest{
-		UserId:          order.UserId,
-		PackageId:       order.PackageId,
-		OrderDate:       order.OrderDate,
-		Days:            order.Days,
+	orderRequest := model.Order{
+		UserId:    order.UserId,
+		PackageId: order.PackageId,
+
+		EndDate:         order.EndDate,
 		DeliveryAddress: order.DeliveryAddress,
 		Status:          order.Status,
 	}
 
-	err = s.UpdateOrder(id, orderRequest)
+	err = s.repo.UpdateOrder(id, orderRequest)
 	if err != nil {
 		return err
 	}
@@ -83,6 +83,15 @@ func (s *orderService) UpdateOrder(id string, order model.OrderRequest) error {
 
 func (s *orderService) DeleteOrder(id string) error {
 	err := s.repo.DeleteOrder(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *orderService) ConfirmOrderADayBefore(id string) error {
+	err := s.repo.ConfirmOrderADayBefore(id)
 	if err != nil {
 		return err
 	}

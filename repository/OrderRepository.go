@@ -14,8 +14,9 @@ type OrderRepositoryInterface interface {
 	GetAllOrders() ([]*model.OrderResponse, error)
 	GetOrder(id string) (model.OrderResponse, error)
 	CreateOrder(order model.Order) (string, error)
-	UpdateOrder(id string, order model.OrderRequest) error
+	UpdateOrder(id string, order model.Order) error
 	DeleteOrder(id string) error
+	ConfirmOrderADayBefore(id string) error
 }
 
 type orderRepository struct {
@@ -58,8 +59,7 @@ func (r *orderRepository) GetAllOrders() ([]*model.OrderResponse, error) {
 			Package: model.PackageResponse{
 				Id: order.PackageId,
 			},
-			OrderDate:       order.OrderDate,
-			Days:            order.Days,
+			EndDate:         order.EndDate,
 			DeliveryAddress: order.DeliveryAddress,
 			Status:          order.Status,
 		})
@@ -95,8 +95,7 @@ func (r *orderRepository) GetOrder(id string) (model.OrderResponse, error) {
 		Package: model.PackageResponse{
 			Id: orderQuery.PackageId,
 		},
-		OrderDate:       orderQuery.OrderDate,
-		Days:            orderQuery.Days,
+		EndDate:         orderQuery.OrderDate,
 		DeliveryAddress: orderQuery.DeliveryAddress,
 		Status:          orderQuery.Status,
 	}
@@ -112,7 +111,7 @@ func (r *orderRepository) CreateOrder(order model.Order) (string, error) {
 
 	return doc.ID, nil
 }
-func (r *orderRepository) UpdateOrder(id string, order model.OrderRequest) error {
+func (r *orderRepository) UpdateOrder(id string, order model.Order) error {
 	_, err := r.client.Collection(r.collection).Doc(id).Set(context.Background(), order)
 	if err != nil {
 		return err
@@ -125,5 +124,19 @@ func (r *orderRepository) DeleteOrder(id string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (r *orderRepository) ConfirmOrderADayBefore(id string) error {
+	_, err := r.client.Collection(r.collection).Doc(id).Update(context.Background(), []firestore.Update{
+		{
+			Path:  "status",
+			Value: model.ORDER_DIKONFIRMASI,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
