@@ -1,15 +1,15 @@
 package model
 
 type User struct {
-	Name               string `json:"name" firestore:"name"`
-	Email              string `json:"email" firestore:"email"`
-	Password           string `json:"password" firestore:"password"`
-	PhoneNumber        string `json:"phone_number" firestore:"phone_number"`
-	Address            string `json:"address" firestore:"address"`
-	City               string `json:"city" firestore:"city"`
-	PostalCode         string `json:"postal_code" firestore:"postal_code"`
-	PastStrikePoint    int    `json:"past_strike_point" firestore:"past_strike_point"`
-	CurrentStrikePoint int    `json:"current_strike_point" firestore:"current_strike_point"`
+	Name               string `json:"name" firestore:"Name"`
+	Email              string `json:"email" firestore:"Email"`
+	Password           string `json:"password" firestore:"Password"`
+	PhoneNumber        string `json:"phone_number" firestore:"PhoneNumber"`
+	Address            string `json:"address" firestore:"Address"`
+	City               string `json:"city" firestore:"City"`
+	PostalCode         string `json:"postal_code" firestore:"Postal_code"`
+	PastStrikePoint    int    `json:"past_strike_point" firestore:"PastStrikePoint"`
+	CurrentStrikePoint int    `json:"current_strike_point" firestore:"CurrentStrikePoint"`
 }
 
 type UserResponse struct {
