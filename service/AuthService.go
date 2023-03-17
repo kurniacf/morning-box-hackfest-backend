@@ -35,13 +35,15 @@ func (s *authService) Signin(authSignIn model.AuthSignin) (*model.UserResponse, 
 	}
 
 	userResponse := &model.UserResponse{
-		Id:          user.Id,
-		Name:        user.Name,
-		Email:       user.Email,
-		PhoneNumber: user.PhoneNumber,
-		Address:     user.Address,
-		City:        user.City,
-		PostalCode:  user.PostalCode,
+		Id:                 user.Id,
+		Name:               user.Name,
+		Email:              user.Email,
+		PhoneNumber:        user.PhoneNumber,
+		Address:            user.Address,
+		City:               user.City,
+		PostalCode:         user.PostalCode,
+		PastStrikePoint:    user.PastStrikePoint,
+		CurrentStrikePoint: user.CurrentStrikePoint,
 	}
 
 	return userResponse, nil
