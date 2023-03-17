@@ -32,22 +32,22 @@ func main() {
 	// Auth routes
 	routes.AddAuthRoutes(r)
 
-	// Food routes
+	// // Food routes
 	routes.AddFoodRoutes(r)
 
-	// Package routes
+	// // Package routes
 	routes.AddPackageRoutes(r)
 
-	// User routes
+	// // User routes
 	routes.AddUserRoutes(r)
 
-	// Point routes
+	// // Point routes
 	routes.AddPointRoutes(r)
 
-	// Order routes
+	// // Order routes
 	routes.AddOrderRoutes(r)
 
-	// Payment routes
+	// // Payment routes
 	routes.AddPaymentRoutes(r)
 
 	r.Run(port)

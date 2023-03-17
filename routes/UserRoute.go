@@ -16,9 +16,9 @@ func AddUserRoutes(r *gin.Engine) {
 	userHandler := handler.NewUserHandler(userService)
 	userGroup := r.Group("/users")
 	{
-		userGroup.GET("", userHandler.GetAllUsers)
+		userGroup.GET("/", userHandler.GetAllUsers)
 		userGroup.GET("/:id", userHandler.GetUser)
-		userGroup.POST("", userHandler.CreateUser)
+		userGroup.POST("/", userHandler.CreateUser)
 		userGroup.PUT("/:id", userHandler.UpdateUser)
 		userGroup.DELETE("/:id", userHandler.DeleteUser)
 	}

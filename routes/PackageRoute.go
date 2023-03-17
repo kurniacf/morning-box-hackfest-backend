@@ -17,9 +17,9 @@ func AddPackageRoutes(r *gin.Engine) {
 
 	packageGroup := r.Group("/packages")
 	{
-		packageGroup.GET("", packageHandler.GetAllPackages)
+		packageGroup.GET("/", packageHandler.GetAllPackages)
 		packageGroup.GET("/:id", packageHandler.GetPackage)
-		packageGroup.POST("", packageHandler.CreatePackage)
+		packageGroup.POST("/", packageHandler.CreatePackage)
 		packageGroup.PUT("/:id", packageHandler.UpdatePackage)
 		packageGroup.DELETE("/:id", packageHandler.DeletePackage)
 	}

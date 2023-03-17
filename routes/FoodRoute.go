@@ -17,9 +17,9 @@ func AddFoodRoutes(r *gin.Engine) {
 
 	foodGroup := r.Group("/foods")
 	{
-		foodGroup.GET("", foodHandler.GetAllFoods)
+		foodGroup.GET("/", foodHandler.GetAllFoods)
 		foodGroup.GET("/:id", foodHandler.GetFood)
-		foodGroup.POST("", foodHandler.CreateFood)
+		foodGroup.POST("/", foodHandler.CreateFood)
 		foodGroup.PUT("/:id", foodHandler.UpdateFood)
 		foodGroup.DELETE("/:id", foodHandler.DeleteFood)
 	}

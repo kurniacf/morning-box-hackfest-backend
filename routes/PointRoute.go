@@ -16,9 +16,9 @@ func AddPointRoutes(r *gin.Engine) {
 	pointHandler := handler.NewPointHandler(pointService)
 	pointGroup := r.Group("/points")
 	{
-		pointGroup.GET("", pointHandler.GetAllPoints)
+		pointGroup.GET("/", pointHandler.GetAllPoints)
 		pointGroup.GET("/:id", pointHandler.GetPoint)
-		pointGroup.POST("", pointHandler.CreatePoint)
+		pointGroup.POST("/", pointHandler.CreatePoint)
 		pointGroup.PUT("/:id", pointHandler.UpdatePoint)
 		pointGroup.DELETE("/:id", pointHandler.DeletePoint)
 	}
