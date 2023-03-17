@@ -7,7 +7,7 @@ type User struct {
 	PhoneNumber        string `json:"phone_number" firestore:"PhoneNumber"`
 	Address            string `json:"address" firestore:"Address"`
 	City               string `json:"city" firestore:"City"`
-	PostalCode         string `json:"postal_code" firestore:"Postal_code"`
+	PostalCode         string `json:"postal_code" firestore:"PostalCode"`
 	PastStrikePoint    int    `json:"past_strike_point" firestore:"PastStrikePoint"`
 	CurrentStrikePoint int    `json:"current_strike_point" firestore:"CurrentStrikePoint"`
 }
