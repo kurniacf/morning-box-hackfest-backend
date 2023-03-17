@@ -44,6 +44,8 @@ type UserQuery struct {
 	PhoneNumber        string `json:"phone_number"`
 	Address            string `json:"address"`
 	Point              int    `json:"point"`
+	City               string `json:"city"`
+	PostalCode         string `json:"postal_code"`
 	PastStrikePoint    int    `json:"past_strike_point"`
 	CurrentStrikePoint int    `json:"current_strike_point"`
 }

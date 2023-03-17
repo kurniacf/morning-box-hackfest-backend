@@ -10,10 +10,10 @@ import (
 )
 
 type PaymentServiceInterface interface {
-	CreateTransaction(order model.OrderResponse) (string, error)
-	CreateTokenTransactionWithGateway(order model.OrderResponse) (string, error)
-	CreateUrlTransactionWithGateway(order model.OrderResponse) (string, error)
-	//ProcessWebhookNotification(notification *midtrans.TransactionNotification) error
+	CreateTransaction(chargeReq *snap.Request) (string, error)
+	CreateTokenTransactionWithGateway(chargeReq *snap.Request) (string, error)
+	CreateUrlTransactionWithGateway(chargeReq *snap.Request) (string, error)
+	GenerateSnapReq(order model.OrderPaymentResponse, pkg model.PackageResponse) *snap.Request
 }
 
 type paymentService struct {
