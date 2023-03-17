@@ -19,6 +19,15 @@ type OrderResponse struct {
 	Status          string          `json:"status"`
 }
 
+type OrderPaymentResponse struct {
+	Id              string    `json:"id"`
+	UserId          string    `json:"userId" firestore:"userId"`
+	PackageId       string    `json:"packageId" firestore:"packageId"`
+	EndDate         time.Time `json:"endDate" firestore:"endDate"`
+	DeliveryAddress string    `json:"deliveryAddress"`
+	Status          string    `json:"status"`
+}
+
 type OrderRequest struct {
 	UserId          string `json:"userId" binding:"required"`
 	PackageId       string `json:"packageId" binding:"required"`

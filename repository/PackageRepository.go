@@ -7,6 +7,14 @@ import (
 	"cloud.google.com/go/firestore"
 )
 
+type PackageRepositoryInterface interface {
+	GetAllPackages() ([]*model.PackageResponse, error)
+	GetPackage(id string) (model.PackageResponse, error)
+	CreatePackage(p model.Package) (string, error)
+	UpdatePackage(id string, p model.Package) error
+	DeletePackage(id string) error
+}
+
 type PackageRepository struct {
 	client     *firestore.Client
 	collection string

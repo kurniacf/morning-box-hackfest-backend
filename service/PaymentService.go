@@ -1,10 +1,10 @@
-// File: service/snap.go
 package service
 
 import (
 	"errors"
 	"morning-box-hackfest-be/config"
 	"morning-box-hackfest-be/model"
+	"morning-box-hackfest-be/repository"
 
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/snap"
@@ -17,18 +17,29 @@ type PaymentServiceInterface interface {
 	//ProcessWebhookNotification(notification *midtrans.TransactionNotification) error
 }
 
-type paymentService struct{}
-
-func NewPaymentService() *paymentService {
-	return &paymentService{}
+type paymentService struct {
+	pkgRepo  repository.PackageRepositoryInterface
+	userRepo repository.UserRepositoryInterface
 }
 
-func (s *paymentService) CreateTransaction(order model.OrderResponse) (string, error) {
+func NewPaymentService(pkgRepo repository.PackageRepositoryInterface, userRepo repository.UserRepositoryInterface) *paymentService {
+	return &paymentService{
+		pkgRepo:  pkgRepo,
+		userRepo: userRepo,
+	}
+}
+
+func (s *paymentService) CreateTransaction(order model.OrderPaymentResponse) (string, error) {
 	if order.Id == "" {
 		return "", errors.New("invalid order")
 	}
 
-	chargeReq := GenerateSnapReq(order)
+	pkg, err := s.pkgRepo.GetPackage(order.PackageId)
+	if err != nil {
+		return "", err
+	}
+
+	chargeReq := GenerateSnapReq(order, pkg)
 
 	response, err := config.MidtransClient.CreateTransaction(chargeReq)
 	if err != nil {
@@ -38,12 +49,17 @@ func (s *paymentService) CreateTransaction(order model.OrderResponse) (string, e
 	return response.RedirectURL, nil
 }
 
-func (s *paymentService) CreateTokenTransactionWithGateway(order model.OrderResponse) (string, error) {
+func (s *paymentService) CreateTokenTransactionWithGateway(order model.OrderPaymentResponse) (string, error) {
 	if order.Id == "" {
 		return "", errors.New("invalid order")
 	}
 
-	chargeReq := GenerateSnapReq(order)
+	pkg, err := s.pkgRepo.GetPackage(order.PackageId)
+	if err != nil {
+		return "", err
+	}
+
+	chargeReq := GenerateSnapReq(order, pkg, s.userRepo)
 
 	token, err := config.MidtransClient.CreateTransactionToken(chargeReq)
 	if err != nil {
@@ -53,12 +69,17 @@ func (s *paymentService) CreateTokenTransactionWithGateway(order model.OrderResp
 	return token, nil
 }
 
-func (s *paymentService) CreateUrlTransactionWithGateway(order model.OrderResponse) (string, error) {
+func (s *paymentService) CreateUrlTransactionWithGateway(order model.OrderPaymentResponse) (string, error) {
 	if order.Id == "" {
 		return "", errors.New("invalid order")
 	}
 
-	chargeReq := GenerateSnapReq(order)
+	pkg, err := s.pkgRepo.GetPackage(order.PackageId)
+	if err != nil {
+		return "", err
+	}
+
+	chargeReq := GenerateSnapReq(order, pkg, s.userRepo)
 
 	url, err := config.MidtransClient.CreateTransactionUrl(chargeReq)
 	if err != nil {
@@ -68,40 +89,34 @@ func (s *paymentService) CreateUrlTransactionWithGateway(order model.OrderRespon
 	return url, nil
 }
 
-func GenerateSnapReq(order model.OrderResponse) *snap.Request {
-	// Initiate Customer address
-	custAddress := &midtrans.CustomerAddress{
-		FName:       order.User.Name,
-		Phone:       order.User.PhoneNumber,
-		Address:     order.User.Address,
-		City:        order.User.City,
-		Postcode:    order.User.PostalCode,
-		CountryCode: "IDN",
+func (r *paymentService) GenerateSnapReq(order model.OrderPaymentResponse, pkg model.PackageResponse) *snap.Request {
+	// Get user details based on UserId
+	user, err := r.userRepo.GetUser(order.UserId)
+	if err != nil {
+		return nil // handle the error appropriately
 	}
 
 	// Initiate Snap Request
 	snapReq := &snap.Request{
 		TransactionDetails: midtrans.TransactionDetails{
 			OrderID:  order.Id,
-			GrossAmt: int64(order.Package.Price),
+			GrossAmt: int64(pkg.Price),
 		},
 		CreditCard: &snap.CreditCardDetails{
 			Secure: true,
 		},
 		CustomerDetail: &midtrans.CustomerDetails{
-			FName:    order.User.Name,
-			Email:    order.User.Email,
-			Phone:    order.User.PhoneNumber,
-			BillAddr: custAddress,
-			ShipAddr: custAddress,
+			FName: user.Name,
+			Email: user.Email,
+			Phone: user.PhoneNumber,
 		},
 		EnabledPayments: snap.AllSnapPaymentType,
 		Items: &[]midtrans.ItemDetails{
 			{
-				ID:    order.Package.Id,
-				Price: int64(order.Package.Price),
+				ID:    order.PackageId,
+				Price: int64(pkg.Price),
 				Qty:   1,
-				Name:  order.Package.Name,
+				Name:  pkg.Name,
 			},
 		},
 	}

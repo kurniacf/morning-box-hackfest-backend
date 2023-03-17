@@ -25,7 +25,7 @@ func NewPaymentHandler(paymentService service.PaymentServiceInterface) *PaymentH
 }
 
 func (pc *PaymentHandler) CreateTransaction(c *gin.Context) {
-	var order model.OrderResponse
+	var order model.OrderPaymentResponse
 	if err := c.BindJSON(&order); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -34,19 +34,19 @@ func (pc *PaymentHandler) CreateTransaction(c *gin.Context) {
 		return
 	}
 
-	response, err := pc.paymentService.CreateTransaction(order)
+	redirectURL, err := pc.paymentService.CreateTransaction(order)
 	if err != nil {
 		fmt.Println("Error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
-			"message": "Failed to process transaction",
+			"message": fmt.Sprintf("Failed to process transaction: %v", err),
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"data":    response,
+		"success":      true,
+		"redirect_url": redirectURL,
 	})
 }
 
