@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"morning-box-hackfest-be/config"
 	"morning-box-hackfest-be/model"
 	"morning-box-hackfest-be/repository"
@@ -29,18 +28,7 @@ func NewPaymentService(pkgRepo repository.PackageRepositoryInterface, userRepo r
 	}
 }
 
-func (s *paymentService) CreateTransaction(order model.OrderPaymentResponse) (string, error) {
-	if order.Id == "" {
-		return "", errors.New("invalid order")
-	}
-
-	pkg, err := s.pkgRepo.GetPackage(order.PackageId)
-	if err != nil {
-		return "", err
-	}
-
-	chargeReq := GenerateSnapReq(order, pkg)
-
+func (s *paymentService) CreateTransaction(chargeReq *snap.Request) (string, error) {
 	response, err := config.MidtransClient.CreateTransaction(chargeReq)
 	if err != nil {
 		return "", err
@@ -49,18 +37,7 @@ func (s *paymentService) CreateTransaction(order model.OrderPaymentResponse) (st
 	return response.RedirectURL, nil
 }
 
-func (s *paymentService) CreateTokenTransactionWithGateway(order model.OrderPaymentResponse) (string, error) {
-	if order.Id == "" {
-		return "", errors.New("invalid order")
-	}
-
-	pkg, err := s.pkgRepo.GetPackage(order.PackageId)
-	if err != nil {
-		return "", err
-	}
-
-	chargeReq := GenerateSnapReq(order, pkg, s.userRepo)
-
+func (s *paymentService) CreateTokenTransactionWithGateway(chargeReq *snap.Request) (string, error) {
 	token, err := config.MidtransClient.CreateTransactionToken(chargeReq)
 	if err != nil {
 		return "", err
@@ -69,18 +46,7 @@ func (s *paymentService) CreateTokenTransactionWithGateway(order model.OrderPaym
 	return token, nil
 }
 
-func (s *paymentService) CreateUrlTransactionWithGateway(order model.OrderPaymentResponse) (string, error) {
-	if order.Id == "" {
-		return "", errors.New("invalid order")
-	}
-
-	pkg, err := s.pkgRepo.GetPackage(order.PackageId)
-	if err != nil {
-		return "", err
-	}
-
-	chargeReq := GenerateSnapReq(order, pkg, s.userRepo)
-
+func (s *paymentService) CreateUrlTransactionWithGateway(chargeReq *snap.Request) (string, error) {
 	url, err := config.MidtransClient.CreateTransactionUrl(chargeReq)
 	if err != nil {
 		return "", err

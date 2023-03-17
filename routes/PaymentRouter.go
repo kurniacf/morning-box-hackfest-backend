@@ -2,15 +2,13 @@ package routes
 
 import (
 	"morning-box-hackfest-be/handler"
-	"morning-box-hackfest-be/repository"
 	"morning-box-hackfest-be/service"
 
 	"github.com/gin-gonic/gin"
 )
 
-func AddPaymentRoutes(r *gin.Engine, pkgRepo *repository.PackageRepository, userRepo repository.UserRepositoryInterface) {
-	paymentService := service.NewPaymentService(pkgRepo, userRepo)
-	paymentHandler := handler.NewPaymentHandler(paymentService)
+func AddPaymentRoutes(r *gin.Engine, paymentService service.PaymentServiceInterface, packageService service.PackageServiceInterface) {
+	paymentHandler := handler.NewPaymentHandler(paymentService, packageService)
 
 	payment := r.Group("/payment")
 	{

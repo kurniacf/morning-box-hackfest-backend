@@ -18,13 +18,14 @@ type PaymentControllerInterface interface {
 
 type PaymentHandler struct {
 	paymentService service.PaymentServiceInterface
+	packageService service.PackageServiceInterface
 }
 
-func NewPaymentHandler(paymentService service.PaymentServiceInterface) *PaymentHandler {
-	return &PaymentHandler{paymentService: paymentService}
+func NewPaymentHandler(paymentService service.PaymentServiceInterface, packageService service.PackageServiceInterface) *PaymentHandler {
+	return &PaymentHandler{paymentService: paymentService, packageService: packageService}
 }
 
-func (pc *PaymentHandler) CreateTransaction(c *gin.Context) {
+func (h *PaymentHandler) CreateTransaction(c *gin.Context) {
 	var order model.OrderPaymentResponse
 	if err := c.BindJSON(&order); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -34,7 +35,18 @@ func (pc *PaymentHandler) CreateTransaction(c *gin.Context) {
 		return
 	}
 
-	redirectURL, err := pc.paymentService.CreateTransaction(order)
+	pkg, err := h.packageService.GetPackage(order.PackageId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	chargeReq := h.paymentService.GenerateSnapReq(order, pkg)
+
+	redirectURL, err := h.paymentService.CreateTransaction(chargeReq)
 	if err != nil {
 		fmt.Println("Error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{

@@ -8,6 +8,7 @@ import (
 	"morning-box-hackfest-be/config"
 	"morning-box-hackfest-be/repository"
 	"morning-box-hackfest-be/routes"
+	"morning-box-hackfest-be/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,6 +31,13 @@ func main() {
 		})
 	})
 
+	firestoreClient := config.GetFirestoreClient()
+	packageRepo := repository.NewPackageRepository(firestoreClient)
+	userRepo := repository.NewUserRepository(firestoreClient)
+
+	paymentService := service.NewPaymentService(packageRepo, userRepo)
+	packageService := service.NewPackageService(packageRepo)
+
 	// Auth routes
 	routes.AddAuthRoutes(r)
 
@@ -46,10 +54,7 @@ func main() {
 	routes.AddOrderRoutes(r)
 
 	// Payment routes
-	firestoreClient := config.GetFirestoreClient()
-	pkgRepo := repository.NewPackageRepository(firestoreClient)
-	userRepo := repository.NewUserRepository(firestoreClient)
-	routes.AddPaymentRoutes(r, pkgRepo, userRepo)
+	routes.AddPaymentRoutes(r, paymentService, packageService)
 
 	r.Run(port)
 }
