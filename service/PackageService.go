@@ -5,6 +5,14 @@ import (
 	"morning-box-hackfest-be/repository"
 )
 
+type PackageServiceInterface interface {
+	GetAllPackages() ([]*model.PackageResponse, error)
+	GetPackage(id string) (model.PackageResponse, error)
+	CreatePackage(p model.PackageRequest) (string, error)
+	UpdatePackage(id string, p model.PackageRequest) error
+	DeletePackage(id string) error
+}
+
 type PackageService struct {
 	repo *repository.PackageRepository
 }

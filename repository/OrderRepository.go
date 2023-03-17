@@ -12,7 +12,7 @@ import (
 
 type OrderRepositoryInterface interface {
 	GetAllOrders() ([]*model.OrderResponse, error)
-	GetOrder(id string) (model.OrderResponse, error)
+	GetOrder(id string) (*model.OrderResponse, error)
 	CreateOrder(order model.Order) (string, error)
 	UpdateOrder(id string, order model.Order) error
 	DeleteOrder(id string) error
@@ -54,7 +54,7 @@ func (r *orderRepository) GetAllOrders() ([]*model.OrderResponse, error) {
 		}
 
 		orders = append(orders, &model.OrderResponse{
-			User: model.UserResponse{
+			User: &model.UserResponse{
 				Id: order.UserId,
 			},
 			Package: model.PackageResponse{
@@ -69,10 +69,10 @@ func (r *orderRepository) GetAllOrders() ([]*model.OrderResponse, error) {
 	return orders, nil
 }
 
-func (r *orderRepository) GetOrder(id string) (model.OrderResponse, error) {
+func (r *orderRepository) GetOrder(id string) (*model.OrderResponse, error) {
 	doc, err := r.client.Collection(r.collection).Doc(id).Get(context.Background())
 	if err != nil {
-		return model.OrderResponse{}, err
+		return nil, err
 	}
 
 	type orderQueryModel struct {
@@ -86,11 +86,11 @@ func (r *orderRepository) GetOrder(id string) (model.OrderResponse, error) {
 
 	var orderQuery orderQueryModel
 	if err = doc.DataTo(&orderQuery); err != nil {
-		return model.OrderResponse{}, err
+		return nil, err
 	}
 
-	order := model.OrderResponse{
-		User: model.UserResponse{
+	order := &model.OrderResponse{
+		User: &model.UserResponse{
 			Id: orderQuery.UserId,
 		},
 		Package: model.PackageResponse{
@@ -162,7 +162,8 @@ func (r *orderRepository) GetActiveOrder(userId string) (*model.OrderResponse, e
 		}
 
 		return &model.OrderResponse{
-			User: model.UserResponse{
+			Id: doc.Ref.ID,
+			User: &model.UserResponse{
 				Id: order.UserId,
 			},
 			Package: model.PackageResponse{

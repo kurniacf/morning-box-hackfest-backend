@@ -10,8 +10,8 @@ import (
 
 type UserRepositoryInterface interface {
 	GetAllUsers() ([]model.UserResponse, error)
-	GetUser(id string) (model.UserResponse, error)
-	CreateUser(user model.UserRequest) (string, error)
+	GetUser(id string) (*model.UserResponse, error)
+	CreateUser(user model.User) (string, error)
 	UpdateUser(id string, user model.UserRequest) error
 	DeleteUser(id string) error
 }
@@ -53,21 +53,21 @@ func (r *userRepository) GetAllUsers() ([]model.UserResponse, error) {
 	return users, nil
 }
 
-func (r *userRepository) GetUser(id string) (model.UserResponse, error) {
+func (r *userRepository) GetUser(id string) (*model.UserResponse, error) {
 	doc, err := r.client.Collection("users").Doc(id).Get(context.Background())
 	if err != nil {
-		return model.UserResponse{}, err
+		return nil, err
 	}
-	var user model.UserResponse
+	var user *model.UserResponse
 	if err = doc.DataTo(&user); err != nil {
-		return model.UserResponse{}, err
+		return nil, err
 	}
 
 	user.Id = doc.Ref.ID
 	return user, nil
 }
 
-func (r *userRepository) CreateUser(user model.UserRequest) (string, error) {
+func (r *userRepository) CreateUser(user model.User) (string, error) {
 	doc, _, err := r.client.Collection("users").Add(context.Background(), user)
 	if err != nil {
 		return "", err

@@ -41,9 +41,6 @@ func main() {
 	// // User routes
 	routes.AddUserRoutes(r)
 
-	// // Point routes
-	routes.AddPointRoutes(r)
-
 	// // Order routes
 	routes.AddOrderRoutes(r)
 

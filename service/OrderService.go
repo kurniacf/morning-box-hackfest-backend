@@ -8,7 +8,7 @@ import (
 
 type OrderServiceInterface interface {
 	GetAllOrders() ([]*model.OrderResponse, error)
-	GetOrder(id string) (model.OrderResponse, error)
+	GetOrder(id string) (*model.OrderResponse, error)
 	CreateOrder(order model.OrderRequest) (string, error)
 	UpdateOrder(id string, order model.OrderUpdateRequest) error
 	DeleteOrder(id string) error
@@ -33,10 +33,10 @@ func (s *orderService) GetAllOrders() ([]*model.OrderResponse, error) {
 	return orders, nil
 }
 
-func (s *orderService) GetOrder(id string) (model.OrderResponse, error) {
+func (s *orderService) GetOrder(id string) (*model.OrderResponse, error) {
 	order, err := s.repo.GetOrder(id)
 	if err != nil {
-		return model.OrderResponse{}, err
+		return nil, err
 	}
 
 	return order, nil

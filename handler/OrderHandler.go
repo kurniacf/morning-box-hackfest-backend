@@ -1,42 +1,36 @@
 package handler
 
 import (
-	"morning-box-hackfest-be/config"
+	"fmt"
 	"morning-box-hackfest-be/model"
-	"morning-box-hackfest-be/repository"
 	"morning-box-hackfest-be/service"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 type orderHandler struct {
-	service service.OrderServiceInterface
+	orderService   service.OrderServiceInterface
+	userService    service.UserServiceInterface
+	packageService service.PackageServiceInterface
+	foodService    service.FoodServiceInterface
+	pointService   service.PointServiceInterface
 }
 
-func NewOrderHandler(service service.OrderServiceInterface) *orderHandler {
-	return &orderHandler{service: service}
+func NewOrderHandler(orderService service.OrderServiceInterface, userService service.UserServiceInterface, packageService service.PackageServiceInterface, foodService service.FoodServiceInterface, pointService service.PointServiceInterface) *orderHandler {
+	return &orderHandler{orderService: orderService, userService: userService, packageService: packageService, foodService: foodService, pointService: pointService}
 }
 
 func (h *orderHandler) GetAllOrders(c *gin.Context) {
-	orders, err := h.service.GetAllOrders()
+	orders, err := h.orderService.GetAllOrders()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get orders"})
 		return
 	}
 
-	firestoreClient := config.GetFirestoreClient()
-
-	packageRepo := repository.NewPackageRepository(firestoreClient)
-	packageService := service.NewPackageService(packageRepo)
-
-	userRepo := repository.NewUserRepository(firestoreClient)
-	userService := service.NewUserService(userRepo)
-
 	for _, order := range orders {
-		order.Package, _ = packageService.GetPackage(order.Package.Id)
-		order.User, _ = userService.GetUser(order.User.Id)
+		order.Package, _ = h.packageService.GetPackage(order.Package.Id)
+		order.User, _ = h.userService.GetUser(order.User.Id)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -46,33 +40,22 @@ func (h *orderHandler) GetAllOrders(c *gin.Context) {
 
 func (h *orderHandler) GetOrder(c *gin.Context) {
 	id := c.Param("id")
-	order, err := h.service.GetOrder(id)
+	order, err := h.orderService.GetOrder(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
-	firestoreClient := config.GetFirestoreClient()
+	order.Package, _ = h.packageService.GetPackage(order.Package.Id)
+	order.User, _ = h.userService.GetUser(order.User.Id)
 
-	packageRepo := repository.NewPackageRepository(firestoreClient)
-	packageService := service.NewPackageService(packageRepo)
-
-	userRepo := repository.NewUserRepository(firestoreClient)
-	userService := service.NewUserService(userRepo)
-
-	foodRepo := repository.NewFoodRepository(firestoreClient)
-	foodService := service.NewFoodService(foodRepo)
-
-	order.Package, _ = packageService.GetPackage(order.Package.Id)
-	order.User, _ = userService.GetUser(order.User.Id)
-
-	order.Package.Foods.Monday, _ = foodService.GetFood(order.Package.Foods.Monday.Id)
-	order.Package.Foods.Tuesday, _ = foodService.GetFood(order.Package.Foods.Tuesday.Id)
-	order.Package.Foods.Wednesday, _ = foodService.GetFood(order.Package.Foods.Wednesday.Id)
-	order.Package.Foods.Thursday, _ = foodService.GetFood(order.Package.Foods.Thursday.Id)
-	order.Package.Foods.Friday, _ = foodService.GetFood(order.Package.Foods.Friday.Id)
-	order.Package.Foods.Saturday, _ = foodService.GetFood(order.Package.Foods.Saturday.Id)
-	order.Package.Foods.Sunday, _ = foodService.GetFood(order.Package.Foods.Tuesday.Id)
+	order.Package.Foods.Monday, _ = h.foodService.GetFood(order.Package.Foods.Monday.Id)
+	order.Package.Foods.Tuesday, _ = h.foodService.GetFood(order.Package.Foods.Tuesday.Id)
+	order.Package.Foods.Wednesday, _ = h.foodService.GetFood(order.Package.Foods.Wednesday.Id)
+	order.Package.Foods.Thursday, _ = h.foodService.GetFood(order.Package.Foods.Thursday.Id)
+	order.Package.Foods.Friday, _ = h.foodService.GetFood(order.Package.Foods.Friday.Id)
+	order.Package.Foods.Saturday, _ = h.foodService.GetFood(order.Package.Foods.Saturday.Id)
+	order.Package.Foods.Sunday, _ = h.foodService.GetFood(order.Package.Foods.Tuesday.Id)
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": order,
@@ -86,7 +69,7 @@ func (h *orderHandler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	id, err := h.service.CreateOrder(req)
+	id, err := h.orderService.CreateOrder(req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -104,7 +87,7 @@ func (h *orderHandler) UpdateOrder(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateOrder(id, req); err != nil {
+	if err := h.orderService.UpdateOrder(id, req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -114,7 +97,7 @@ func (h *orderHandler) UpdateOrder(c *gin.Context) {
 
 func (h *orderHandler) DeleteOrder(c *gin.Context) {
 	id := c.Param("id")
-	err := h.service.DeleteOrder(id)
+	err := h.orderService.DeleteOrder(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete package"})
 		return
@@ -124,18 +107,51 @@ func (h *orderHandler) DeleteOrder(c *gin.Context) {
 }
 
 func (h *orderHandler) ConfirmOrderADayBefore(c *gin.Context) {
-	hour := time.Now().Hour()
+	// hour := time.Now().Hour()
 
-	if !(hour > 18 && hour < 24) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Confirmation can only be done between 18:00 to 24:00"})
+	// if !(hour > 18 && hour < 24) {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "Confirmation can only be done between 18:00 to 24:00"})
+	// 	return
+	// }
+
+	var req model.OrderConfirmRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	id := c.Param("id")
+	// Get Order
+	order, err := h.orderService.GetOrder(req.OrderId)
+	if err != nil || order == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-	err := h.service.ConfirmOrderADayBefore(id)
+	fmt.Println(order)
+
+	if order.Status != model.BELUM_DIKONFIRMASI {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Order has been confirmed"})
+		return
+	}
+
+	// Confirm order
+	err = h.orderService.ConfirmOrderADayBefore(req.OrderId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Confirmation failed"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Get User
+	user, err := h.userService.GetUser(req.UserId)
+	if err != nil || user == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Add strike point
+	err = h.pointService.UpdatePoint(*user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -147,33 +163,22 @@ func (h *orderHandler) GetActiveOrder(c *gin.Context) {
 
 	userId := user.(model.UserResponse).Id
 
-	order, err := h.service.GetActiveOrder(userId)
-	if err != nil {
+	order, err := h.orderService.GetActiveOrder(userId)
+	if err != nil || order == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get active order"})
 		return
 	}
 
-	firestoreClient := config.GetFirestoreClient()
+	order.Package, _ = h.packageService.GetPackage(order.Package.Id)
+	order.User, _ = h.userService.GetUser(order.User.Id)
 
-	packageRepo := repository.NewPackageRepository(firestoreClient)
-	packageService := service.NewPackageService(packageRepo)
-
-	userRepo := repository.NewUserRepository(firestoreClient)
-	userService := service.NewUserService(userRepo)
-
-	foodRepo := repository.NewFoodRepository(firestoreClient)
-	foodService := service.NewFoodService(foodRepo)
-
-	order.Package, _ = packageService.GetPackage(order.Package.Id)
-	order.User, _ = userService.GetUser(order.User.Id)
-
-	order.Package.Foods.Monday, _ = foodService.GetFood(order.Package.Foods.Monday.Id)
-	order.Package.Foods.Tuesday, _ = foodService.GetFood(order.Package.Foods.Tuesday.Id)
-	order.Package.Foods.Wednesday, _ = foodService.GetFood(order.Package.Foods.Wednesday.Id)
-	order.Package.Foods.Thursday, _ = foodService.GetFood(order.Package.Foods.Thursday.Id)
-	order.Package.Foods.Friday, _ = foodService.GetFood(order.Package.Foods.Friday.Id)
-	order.Package.Foods.Saturday, _ = foodService.GetFood(order.Package.Foods.Saturday.Id)
-	order.Package.Foods.Sunday, _ = foodService.GetFood(order.Package.Foods.Tuesday.Id)
+	order.Package.Foods.Monday, _ = h.foodService.GetFood(order.Package.Foods.Monday.Id)
+	order.Package.Foods.Tuesday, _ = h.foodService.GetFood(order.Package.Foods.Tuesday.Id)
+	order.Package.Foods.Wednesday, _ = h.foodService.GetFood(order.Package.Foods.Wednesday.Id)
+	order.Package.Foods.Thursday, _ = h.foodService.GetFood(order.Package.Foods.Thursday.Id)
+	order.Package.Foods.Friday, _ = h.foodService.GetFood(order.Package.Foods.Friday.Id)
+	order.Package.Foods.Saturday, _ = h.foodService.GetFood(order.Package.Foods.Saturday.Id)
+	order.Package.Foods.Sunday, _ = h.foodService.GetFood(order.Package.Foods.Tuesday.Id)
 
 	c.JSON(http.StatusOK, gin.H{"data": order})
 }

@@ -12,7 +12,7 @@ type Order struct {
 
 type OrderResponse struct {
 	Id              string          `json:"id"`
-	User            UserResponse    `json:"user"`
+	User            *UserResponse   `json:"user"`
 	Package         PackageResponse `json:"package"`
 	EndDate         time.Time       `json:"endDate" firestore:"endDate"`
 	DeliveryAddress string          `json:"deliveryAddress"`
@@ -33,6 +33,11 @@ type OrderUpdateRequest struct {
 	EndDate         time.Time `json:"endDate" firestore:"endDate"`
 	DeliveryAddress string    `json:"deliveryAddress" binding:"required"`
 	Status          string
+}
+
+type OrderConfirmRequest struct {
+	UserId  string `json:"userId" binding:"required"`
+	OrderId string `json:"orderId" binding:"required"`
 }
 
 const (

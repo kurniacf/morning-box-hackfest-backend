@@ -7,7 +7,7 @@ import (
 
 type UserServiceInterface interface {
 	GetAllUsers() ([]model.UserResponse, error)
-	GetUser(id string) (model.UserResponse, error)
+	GetUser(id string) (*model.UserResponse, error)
 	CreateUser(user model.UserRequest) (string, error)
 	UpdateUser(id string, user model.UserRequest) error
 	DeleteUser(id string) error
@@ -30,10 +30,10 @@ func (s *userService) GetAllUsers() ([]model.UserResponse, error) {
 	return users, nil
 }
 
-func (s *userService) GetUser(id string) (model.UserResponse, error) {
+func (s *userService) GetUser(id string) (*model.UserResponse, error) {
 	user, err := s.repo.GetUser(id)
 	if err != nil {
-		return model.UserResponse{}, err
+		return nil, err
 	}
 
 	return user, nil
@@ -41,26 +41,18 @@ func (s *userService) GetUser(id string) (model.UserResponse, error) {
 
 func (s *userService) CreateUser(user model.UserRequest) (string, error) {
 	newUser := model.User{
-		Name:        user.Name,
-		Email:       user.Email,
-		Password:    user.Password,
-		PhoneNumber: user.PhoneNumber,
-		Address:     user.Address,
-		City:        user.City,
-		PostalCode:  user.PostalCode,
+		Name:               user.Name,
+		Email:              user.Email,
+		Password:           user.Password,
+		PhoneNumber:        user.PhoneNumber,
+		Address:            user.Address,
+		City:               user.City,
+		PostalCode:         user.PostalCode,
+		PastStrikePoint:    0,
+		CurrentStrikePoint: 0,
 	}
 
-	newUserRequest := model.UserRequest{
-		Name:        newUser.Name,
-		Email:       newUser.Email,
-		Password:    newUser.Password,
-		PhoneNumber: newUser.PhoneNumber,
-		Address:     newUser.Address,
-		City:        user.City,
-		PostalCode:  user.PostalCode,
-	}
-
-	userId, err := s.repo.CreateUser(newUserRequest)
+	userId, err := s.repo.CreateUser(newUser)
 	if err != nil {
 		return "", err
 	}
