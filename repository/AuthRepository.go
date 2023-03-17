@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"morning-box-hackfest-be/model"
 
 	"cloud.google.com/go/firestore"
@@ -47,10 +46,10 @@ func (r *authRepository) GetUserByEmail(email string) (*model.UserQuery, error) 
 			return nil, errors.New("Error retreiving user")
 		}
 
+		user.Id = doc.Ref.ID
+
 		return user, nil
 	}
 
-	fmt.Println("qwe")
-	// return nil, errors.New("User has not been registered")
 	return nil, errors.New("User has not been registered")
 }

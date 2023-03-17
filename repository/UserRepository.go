@@ -72,6 +72,7 @@ func (r *userRepository) CreateUser(user model.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return doc.ID, nil
 }
 
