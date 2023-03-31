@@ -7,6 +7,7 @@
 - [Solution](#solution)
 - [Tech Stack](#tech-stack)
 - [Documentation Postman](#documentation-postman)
+- [How to run](#how-to-run)
 
 ### My Team
 - [Nur Muhammad Ainul Yaqin](https://www.linkedin.com/in/nurmuhammad22/)
@@ -36,3 +37,19 @@ A breakfast habituation platform for overseas students as well as monitoring for
 
 # Documentation Postman
 https://documenter.getpostman.com/view/19606163/2s93JtQ44o
+
+# How to run
+1. Clone this repository
+    ```bash
+    git clone https://github.com/kurniacf/morning-box-hackfest-backend.git
+    ```
+2. Install all dependencies
+    ```bash
+    go get ./...
+    ```
+3. Run the server
+    ```bash
+    go run main.go
+    ```
+4. Run the client
+
