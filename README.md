@@ -49,7 +49,15 @@ https://documenter.getpostman.com/view/19606163/2s93JtQ44o
     ```
 3. Run the server
     ```bash
+    go run . 
+    ```
+    or
+    ```bash
     go run main.go
     ```
-4. Run the client
+    description:
+    - `go run .` to run the server
+    - `go run . -migrate` to run the server and migrate the database
+    - `go run . -seed` to run the server and seed the database
 
+4. Run the client
